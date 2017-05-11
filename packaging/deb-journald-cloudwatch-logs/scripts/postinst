@@ -1,0 +1,4 @@
+#!/bin/bash
+
+mkdir -p /srv/journald-cloudwatch-logs
+chown -R logshipper:logshipper /srv/journald-cloudwatch-logs

@@ -1,0 +1,76 @@
+{
+	variables: {
+		aws_access_key_id: "{{ env `AWS_ACCESS_KEY_ID` }}",
+		aws_secret_access_key: "{{ env `AWS_SECRET_ACCESS_KEY` }}",
+		region: "{{ env `AWS_REGION` }}",
+		vpc_id: "{{ env `PACKER_VPC_ID` }}",
+		subnet_id: "{{ env `PACKER_SUBNET_ID` }}",
+		environment: "{{ env `PACKER_ENVIRONMENT` }}"
+	},
+
+	builders: [{
+		type: "amazon-ebs",
+		access_key: "{{ user `aws_access_key_id` }}",
+		secret_key: "{{ user `aws_secret_access_key` }}",
+		region: "{{user `region`}}",
+		spot_price_auto_product: "Linux/UNIX (Amazon VPC)",
+
+		ssh_pty: true,
+		instance_type: "t2.medium",
+		vpc_id: "{{user `vpc_id` }}",
+		subnet_id: "{{user `subnet_id` }}",
+		associate_public_ip_address: true,
+
+		source_ami_filter: {
+			most_recent: true,
+			owners: ["self"],
+			filters: {
+				"tag:Component": "BaseAMI",
+				"tag:OS": "Ubuntu-16.04"
+			}
+		},
+
+		ssh_username: "ops",
+		ssh_timeout: "5m",
+		
+		launch_block_device_mappings: [
+			{
+				device_name: "/dev/xvdf",
+				delete_on_termination: true,
+				volume_size: 100,
+				volume_type: "gp2",
+			},
+			{
+				device_name: "/dev/xvdg",
+				delete_on_termination: true,
+				volume_size: 100,
+				volume_type: "gp2",
+			}
+		],
+
+		ami_virtualization_type: "hvm",
+		ami_description: "Consul - {{user `environment`}} -  ({{isotime \"2006-01-02-1504\"}})",
+		ami_name: "consul-server-{{isotime \"2006-01-02-1504\"}}",
+		snapshot_tags: {
+			"Name": "{{user `environment`}} Consul Server",
+		},
+		tags: {
+			"Name": "{{user `environment`}} Consul Server",
+			"Component": "ConsulServer",
+			"OS": "Ubuntu-16.04",
+		},
+	}],
+	provisioners: [
+        {
+            type: "shell",
+            start_retry_timeout: "10m",
+            execute_command: "sudo -S sh -c '{{ .Vars }} {{ .Path }}'",
+            scripts: [
+                "scripts/data.sh",
+                "scripts/packages.sh",
+                "scripts/cleanup.sh",
+            ],
+        }
+	]
+}
+

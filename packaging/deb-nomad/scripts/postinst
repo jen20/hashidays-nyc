@@ -1,0 +1,4 @@
+#!/bin/bash
+
+mkdir -p /srv/nomad
+chown -R nomad:nomad /srv/nomad

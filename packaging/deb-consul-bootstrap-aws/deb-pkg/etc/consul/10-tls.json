@@ -1,0 +1,8 @@
+{
+	"key_file": "/secrets/server.key",
+	"cert_file": "/secrets/server.cert",
+	"ca_file": "/usr/local/share/ca-certificates/ConsulCA.crt",
+	"ports": {
+		"https": 8443
+	}
+}

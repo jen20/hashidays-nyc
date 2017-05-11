@@ -1,0 +1,44 @@
+# Configuration placed by openssh-ca-config package
+Port 22
+Protocol 2
+
+UsePrivilegeSeparation yes
+
+TrustedUserCAKeys /etc/ssh/ca.pub
+AllowUsers ops
+
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_dsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+UsePAM yes
+
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+
+SyslogFacility AUTH
+LogLevel INFO
+
+LoginGraceTime 60
+PermitRootLogin no
+StrictModes yes
+
+PubkeyAuthentication yes
+
+IgnoreRhosts yes
+HostbasedAuthentication no
+
+PermitEmptyPasswords no
+AcceptEnv LANG LC_*
+
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+
+X11Forwarding no
+GatewayPorts no
+
+PrintMotd no
+PrintLastLog yes
+
+TCPKeepAlive yes

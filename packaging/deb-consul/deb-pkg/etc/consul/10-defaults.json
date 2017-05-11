@@ -1,0 +1,5 @@
+{
+    "data_dir": "/srv/consul",
+    "disable_remote_exec": true,
+    "raft_protocol": 3
+}

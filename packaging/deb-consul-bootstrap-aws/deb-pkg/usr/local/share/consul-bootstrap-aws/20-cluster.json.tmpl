@@ -1,0 +1,22 @@
+{
+        "server": true,
+        "ui": true,
+        "bind_addr": "{{ GetPrivateIP }}",
+        "bootstrap_expect": 3,
+        "encrypt": "[[ ec2tag "consul:serf_key" ]]",
+
+        "datacenter": "aws-[[ ec2region ]]",
+        "node_name": "server-[[ ec2meta "local-ipv4" ]]",
+        "domain": "[[ ec2tag "consul:tld" ]]",
+
+        "retry_join_ec2": {
+                "tag_key": "aws:autoscaling:groupName",
+                "tag_value": "[[ ec2tag "aws:autoscaling:groupName" ]]",
+                "region": "[[ ec2region ]]"
+        },
+
+        "autopilot": {
+            "cleanup_dead_servers": true,
+            "redundancy_zone_tag": "[[ ec2meta "placement/availability-zone" ]]"
+        }
+}

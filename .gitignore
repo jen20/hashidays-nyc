@@ -1,0 +1,9 @@
+.DS_Store
+.idea/
+*.iml
+.terraform/
+
+ssh-ca/
+
+*.tfstate
+*.tfstate.backup

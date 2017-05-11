@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ "$1" = "purge" ] ; then
+    rm -rf /etc/journald-cloudwatch-logs
+    groupdel logshipper
+    userdel logshipper
+fi
+
+exit 0

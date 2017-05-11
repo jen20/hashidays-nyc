@@ -1,0 +1,23 @@
+#cloud-config
+
+disable_root: true
+disable_root_opts: no-port-forwarding,no-agent-forwarding,no-X11-forwarding,command="echo 'root SSH access to this machine is disabled.';echo;sleep 10"
+ssh_deletekeys: true
+
+groups:
+  - ops
+
+users:
+  - name: ops
+    gecos: "Operations User"
+    primary-group: ops
+    shell: /bin/bash
+    lock_passwd: true
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+
+runcmd:
+  - "mkdir -p /home/ops/.ssh"
+  - "wget -qO- http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key/ | tee /home/ops/.ssh/authorized_keys"
+  - "chown -R ops:ops /home/ops/.ssh"
+  - "chmod 600 /home/ops/.ssh/authorized_keys"
+  - "sed -i \"s/127.0.0.1\\s*localhost.*$/127.0.0.1 localhost $(hostname)/\" /etc/hosts"

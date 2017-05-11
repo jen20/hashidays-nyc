@@ -1,0 +1,4 @@
+#!/bin/bash
+
+mkdir -p /srv/consul
+chown -R consul:consul /srv/consul

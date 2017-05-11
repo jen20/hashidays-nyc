@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ "$1" = "purge" ] ; then
+    rm -rf /etc/vault
+    groupdel vault
+    userdel vault
+fi
+
+exit 0
+

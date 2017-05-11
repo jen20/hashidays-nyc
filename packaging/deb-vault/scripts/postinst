@@ -1,0 +1,4 @@
+#!/bin/bash
+
+mkdir -p /srv/vault
+chown -R vault:vault /srv/vault

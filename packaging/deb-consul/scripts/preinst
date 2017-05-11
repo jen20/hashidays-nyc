@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -eu
+
+USER="consul"
+GECOS="Consul"
+GROUP="$USER"
+HOME="/srv/consul"
+
+if which ypwhich >/dev/null 2>&1 && ypwhich >/dev/null 2>&1 ; then
+    set +e
+fi
+
+if ! getent group ${GROUP} >/dev/null; then
+    addgroup --system $GROUP >/dev/null
+fi
+
+if ! getent passwd ${USER} >/dev/null; then
+    adduser \
+        --system \
+        --disabled-login \
+        --ingroup ${GROUP} \
+        --home ${HOME} \
+        --no-create-home \
+        --gecos "${GECOS}" \
+        --shell /bin/false \
+        ${USER} >/dev/null
+fi

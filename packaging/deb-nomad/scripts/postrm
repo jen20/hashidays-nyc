@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ "$1" = "purge" ] ; then
+    rm -rf /etc/nomad
+    groupdel nomad
+    userdel nomad
+fi
+
+exit 0
+

@@ -1,0 +1,80 @@
+{
+	variables: {
+		aws_access_key_id: "{{ env `AWS_ACCESS_KEY_ID` }}",
+		aws_secret_access_key: "{{ env `AWS_SECRET_ACCESS_KEY` }}",
+		region: "{{ env `AWS_REGION` }}",
+		vpc_id: "{{ env `PACKER_VPC_ID` }}",
+		subnet_id: "{{ env `PACKER_SUBNET_ID` }}",
+
+		apt_repo_url: "{{ env `PACKER_APT_REPO` }}",
+		ca_roots_package: "{{ env `PACKER_CA_ROOTS_PACKAGE` }}",
+		environment: "{{ env `PACKER_ENVIRONMENT` }}",
+		ssh_ca_package: "{{ env `PACKER_SSH_CA_PACKAGE` }}",
+	},
+
+	builders: [{
+		type: "amazon-ebs",
+		access_key: "{{ user `aws_access_key_id` }}",
+		secret_key: "{{ user `aws_secret_access_key` }}",
+		region: "{{user `region`}}",
+		spot_price_auto_product: "Linux/UNIX (Amazon VPC)",
+
+		instance_type: "t2.micro",
+		vpc_id: "{{user `vpc_id` }}",
+		subnet_id: "{{user `subnet_id` }}",
+		associate_public_ip_address: true,
+		user_data_file: "files/cloudinit-source.yml",
+		
+		source_ami_filter: {
+			filters: {
+				"virtualization-type": "hvm",
+				"name": "*ubuntu-xenial-16.04-amd64-zfs-server-*",
+				"root-device-type": "ebs"
+			},
+			owners: ["self"],
+			most_recent: true
+		},
+		
+		ssh_pty: true,
+		ssh_username: "ops",
+		ssh_timeout: "5m",
+
+		ami_virtualization_type: "hvm",
+		ami_description: "Base AMI",
+		ami_name: "base-{{isotime \"2006-01-02-1504\"}}",
+		snapshot_tags: {
+			Name: "{{ user `environment` }} Base AMI"
+		},
+		tags: {
+			Name: "{{ user `environment` }} Base AMI",
+			Component: "BaseAMI",
+			OS: "Ubuntu-16.04"
+		},
+	}],
+
+	provisioners: [
+		{
+			type: "file",
+			source: "files/cloudinit-config.yml",
+			destination: "/tmp/cloud.cfg"
+		},
+		{
+			type: "shell",
+			start_retry_timeout: "5m",
+            scripts: [
+                "scripts/cloudinit.sh",
+                "scripts/repo.sh",
+                "scripts/motd.sh",
+                "scripts/cleanup.sh",
+            ],
+            execute_command: "sudo -S sh -c '{{ .Vars }} {{ .Path }}'",
+            environment_vars: [
+                "APT_REPO_URL={{ user `apt_repo_url` }}",
+                "SSHD_CONFIG_PACKAGE={{ user `ssh_ca_package` }}",
+                "CA_ROOTS_PACKAGE={{ user `ca_roots_package` }}",
+                "MOTD_ENVIRONMENT={{ user `environment` }}",
+                "MOTD_REGION={{ user `region` }}",
+            ],
+		},
+	]
+}
