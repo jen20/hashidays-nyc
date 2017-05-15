@@ -4,6 +4,9 @@ This repository is the accompanying code for James Nugent's talk at HashiDays
 New York 2017. It demonstrates deploying the HashiCorp runtime stack (Consul,
 Nomad and Vault) in a production quality fashion on AWS.
 
+*Note: The code in this repository will provision real resources in AWS which
+cost real money! Be careful!*
+
 ## Usage
 
 The following steps cover local usage from Mac OS X. The steps from Illumos or
@@ -344,7 +347,10 @@ make base-os-config
 ### Build a Consul Server AMI
 
 Now we have the base AMI with our customizations, we can start to build
-application servers. The first one we'll do is Consul. The AMI will be configured to self-bootstrap into a Consul Server cluster when run in an Autoscaling group with approriate settings. All of the configuration to actually do that is delivered in a package - `consul-bootstrap-aws`.
+application servers. The first one we'll do is Consul. The AMI will be
+configured to self-bootstrap into a Consul Server cluster when run in an
+Autoscaling group with approriate settings. All of the configuration to
+actually do that is delivered in a package - `consul-bootstrap-aws`.
 
 As Consul has data stored in it, we'll use a pair of mirrored ZFS EBS volumes
 in their own pool, with a dataset for each service running on the box. 100GB is
@@ -362,6 +368,38 @@ cd packer
 make consul-server
 ```
 
+### Build the infrastructure for Consul Servers
+
+We can now use our Consul Server AMI to build the infrastructure which supports
+it - an autoscaling group, policies and so forth. This is all provisioned via
+Terraform.
+
+To built it, run the following commands:
+
+```
+cd terraform
+make consul-servers
+
+# Check the plan
+make consul-servers ACTION=apply
+```
+
+#### Experiment with Consul Autopilot
+
+Once the infrastructure comes up, satisfy yourself of the following:
+
+- The Consul servers have their private IP addresses attached to a DNS A
+  record at `consul` for the VPC private hosted zone. 
+
+- Instances in the VPC can find Consul servers by resolving `consul` using `dig
+  +search consul`.
+
+- Terminating an instance replaces it with a new server, automatically joining
+  the cluster.
+
+- Consul manages the quorum correctly, removing the dead server.
+
+- `journald` logs from the Consul servers are streaming to CloudWatch.
 
 [teamcity]: https://www.jetbrains.com/teamcity/
 [jenkins]: https://jenkins.io/index.html
