@@ -11,6 +11,8 @@
 		access_key: "{{ user `aws_access_key_id` }}",
 		secret_key: "{{ user `aws_secret_access_key` }}",
 		region: "{{user `region`}}",
+
+		spot_price: "auto",
 		spot_price_auto_product: "Linux/UNIX (Amazon VPC)",
 
 		ssh_pty: true,
