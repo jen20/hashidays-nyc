@@ -4,6 +4,10 @@ This repository is the accompanying code for James Nugent's talk at HashiDays
 New York 2017. It demonstrates deploying the HashiCorp runtime stack (Consul,
 Nomad and Vault) in a production quality fashion on AWS.
 
+**Note: This code has not kept pace with the improvements to Terraform, and
+targets the version of Terraform that was current at the time of the talk. Pull
+requests to make it work with 0.12 are welcome!**
+
 *Note: The code in this repository will provision real resources in AWS which
 cost real money! Be careful!*
 
